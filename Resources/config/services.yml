@@ -1,0 +1,72 @@
+parameters:
+    es.logging.path: "%kernel.logs_dir%/elasticsearch_%kernel.environment%.log"
+    es.profiler.template: SteerfoxElasticsearchBundle:Profiler:profiler.html.twig
+
+services:
+    es.export:
+        class: Steerfox\ElasticsearchBundle\Service\ExportService
+
+    es.import:
+        class: Steerfox\ElasticsearchBundle\Service\ImportService
+
+    es.client.index_suffix_finder:
+        class: Steerfox\ElasticsearchBundle\Service\IndexSuffixFinder
+
+    es.cache_engine:
+        class: Doctrine\Common\Cache\FilesystemCache
+        arguments: ["%kernel.cache_dir%/steerfox/elasticsearch", ".steerfox.data"]
+
+    es.annotations.cached_reader:
+        class: Doctrine\Common\Annotations\CachedReader
+        arguments: ["@annotations.reader", "@es.cache_engine", "%kernel.debug%"]
+
+    es.document_finder:
+        class: Steerfox\ElasticsearchBundle\Mapping\DocumentFinder
+        arguments: ["%kernel.bundles%"]
+        public: false
+
+    es.document_parser:
+        class: Steerfox\ElasticsearchBundle\Mapping\DocumentParser
+        arguments: ["@es.annotations.cached_reader", "@es.document_finder"]
+        public: false
+
+    es.metadata_collector:
+        class: Steerfox\ElasticsearchBundle\Mapping\MetadataCollector
+        arguments: ["@es.document_finder", "@es.document_parser", "@es.cache_engine"]
+        calls:
+            - [setEnableCache, ["%es.cache%"]]
+
+    es.logger.collection_handler:
+        class: Steerfox\ElasticsearchBundle\Profiler\Handler\CollectionHandler
+        public: false
+
+    es.tracer:
+        class: Monolog\Logger
+        arguments: ['steerfox']
+        calls:
+            - [pushHandler, ["@es.logger.collection_handler"]]
+
+    es.profiler:
+        class: Steerfox\ElasticsearchBundle\Profiler\ElasticsearchProfiler
+        calls:
+            - [setManagers, ["%es.managers%"]]
+            - [addLogger, ["@es.tracer"]]
+        tags:
+            - {name: data_collector, template: "%es.profiler.template%", id: steerfox.profiler}
+
+    es.result_converter:
+        class: Steerfox\ElasticsearchBundle\Result\Converter
+        arguments: ["@es.metadata_collector"]
+
+    es.terminate_listener:
+        class: Steerfox\ElasticsearchBundle\EventListener\TerminateListener
+        arguments: ["@service_container", "%es.managers%"]
+        tags:
+            - { name: kernel.event_listener, event: kernel.terminate }
+
+    es.generator.document:
+        class: Steerfox\ElasticsearchBundle\Generator\DocumentGenerator
+
+    es.generate:
+        class: Steerfox\ElasticsearchBundle\Service\GenerateService
+        arguments: ["@es.generator.document", "@filesystem"]
