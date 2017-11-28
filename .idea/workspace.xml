@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="09f1c01f-dc1c-4abb-a995-66d76490eeab" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/composer.json" afterPath="$PROJECT_DIR$/composer.json" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -47,7 +48,7 @@
       <file leaf-file-name="DocumentParser.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Mapping/DocumentParser.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="678">
+            <state relative-caret-position="10460">
               <caret line="539" column="39" lean-forward="false" selection-start-line="539" selection-start-column="39" selection-end-line="539" selection-end-column="39" />
               <folding>
                 <element signature="e#286#337#0#PHP" expanded="true" />
@@ -56,11 +57,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="IndexCreateCommand.php" pinned="false" current-in-tab="true">
+      <file leaf-file-name="IndexCreateCommand.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Command/IndexCreateCommand.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-360">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state relative-caret-position="300">
+              <caret line="26" column="7" lean-forward="true" selection-start-line="26" selection-start-column="7" selection-end-line="26" selection-end-column="7" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="composer.json" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/composer.json">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="220">
+              <caret line="11" column="6" lean-forward="true" selection-start-line="11" selection-start-column="6" selection-end-line="11" selection-end-column="6" />
               <folding />
             </state>
           </provider>
@@ -69,7 +80,7 @@
       <file leaf-file-name="CreateIndexCommandTest.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Tests/Functional/Command/CreateIndexCommandTest.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="348">
+            <state relative-caret-position="3680">
               <caret line="194" column="35" lean-forward="false" selection-start-line="194" selection-start-column="35" selection-end-line="194" selection-end-column="35" />
               <folding />
             </state>
@@ -129,7 +140,7 @@
       <file leaf-file-name="Manager.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Service/Manager.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="117">
+            <state relative-caret-position="9460">
               <caret line="490" column="25" lean-forward="true" selection-start-line="490" selection-start-column="25" selection-end-line="490" selection-end-column="25" />
               <folding>
                 <element signature="e#286#311#0#PHP" expanded="true" />
@@ -141,7 +152,7 @@
       <file leaf-file-name="DocumentGenerateCommand.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Command/DocumentGenerateCommand.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="299">
+            <state relative-caret-position="6860">
               <caret line="357" column="50" lean-forward="false" selection-start-line="357" selection-start-column="50" selection-end-line="357" selection-end-column="50" />
               <folding />
             </state>
@@ -151,7 +162,7 @@
       <file leaf-file-name="MetadataCollector.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Mapping/MetadataCollector.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="832">
+            <state relative-caret-position="1220">
               <caret line="70" column="20" lean-forward="false" selection-start-line="70" selection-start-column="20" selection-end-line="70" selection-end-column="20" />
               <folding />
             </state>
@@ -171,7 +182,7 @@
       <file leaf-file-name="PropertyTest.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Tests/Unit/Annotation/PropertyTest.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="197">
+            <state relative-caret-position="300">
               <caret line="22" column="20" lean-forward="false" selection-start-line="22" selection-start-column="20" selection-end-line="22" selection-end-column="20" />
               <folding />
             </state>
@@ -456,6 +467,7 @@
         <option value="$PROJECT_DIR$/Service/ManagerFactory.php" />
         <option value="$PROJECT_DIR$/Service/Manager.php" />
         <option value="$PROJECT_DIR$/Mapping/DocumentParser.php" />
+        <option value="$PROJECT_DIR$/composer.json" />
       </list>
     </option>
   </component>
@@ -530,6 +542,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -541,8 +555,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -577,15 +589,17 @@
       <option name="presentableId" value="Default" />
       <updated>1511438055053</updated>
       <workItem from="1511438056326" duration="14530000" />
-      <workItem from="1511766874107" duration="2378000" />
+      <workItem from="1511766874107" duration="4179000" />
+      <workItem from="1511857597178" duration="47000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="16908000" />
+    <option name="totallyTimeSpent" value="18756000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="59" y="25" width="1861" height="1055" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="PlantUML" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -595,11 +609,10 @@
       <window_info id="Mongo Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Graph Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24958678" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24958678" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Tail" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Graph Database Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32900432" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -608,6 +621,7 @@
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32900432" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -622,17 +636,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Resources/doc/crud.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="0">
-            <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-            <folding />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Resources/doc/overwriting_bundle.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
@@ -807,7 +810,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -934,7 +936,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="540">
           <caret line="35" column="63" lean-forward="true" selection-start-line="35" selection-start-column="63" selection-end-line="35" selection-end-column="63" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1011,7 +1012,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="270">
           <caret line="99" column="5" lean-forward="false" selection-start-line="99" selection-start-column="5" selection-end-line="99" selection-end-column="5" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1025,7 +1025,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Command/DocumentGenerateCommand.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="299">
+        <state relative-caret-position="6860">
           <caret line="357" column="50" lean-forward="false" selection-start-line="357" selection-start-column="50" selection-end-line="357" selection-end-column="50" />
           <folding />
         </state>
@@ -1033,7 +1033,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Mapping/MetadataCollector.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="832">
+        <state relative-caret-position="1220">
           <caret line="70" column="20" lean-forward="false" selection-start-line="70" selection-start-column="20" selection-end-line="70" selection-end-column="20" />
           <folding />
         </state>
@@ -1041,7 +1041,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Tests/Unit/Annotation/PropertyTest.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="197">
+        <state relative-caret-position="300">
           <caret line="22" column="20" lean-forward="false" selection-start-line="22" selection-start-column="20" selection-end-line="22" selection-end-column="20" />
           <folding />
         </state>
@@ -1057,7 +1057,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Tests/Functional/Command/CreateIndexCommandTest.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="348">
+        <state relative-caret-position="3680">
           <caret line="194" column="35" lean-forward="false" selection-start-line="194" selection-start-column="35" selection-end-line="194" selection-end-column="35" />
           <folding />
         </state>
@@ -1065,7 +1065,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Service/Manager.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="117">
+        <state relative-caret-position="9460">
           <caret line="490" column="25" lean-forward="true" selection-start-line="490" selection-start-column="25" selection-end-line="490" selection-end-column="25" />
           <folding>
             <element signature="e#286#311#0#PHP" expanded="true" />
@@ -1075,7 +1075,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Mapping/DocumentParser.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="678">
+        <state relative-caret-position="10460">
           <caret line="539" column="39" lean-forward="false" selection-start-line="539" selection-start-column="39" selection-end-line="539" selection-end-column="39" />
           <folding>
             <element signature="e#286#337#0#PHP" expanded="true" />
@@ -1085,8 +1085,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Command/IndexCreateCommand.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-360">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state relative-caret-position="300">
+          <caret line="26" column="7" lean-forward="true" selection-start-line="26" selection-start-column="7" selection-end-line="26" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/composer.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="220">
+          <caret line="11" column="6" lean-forward="true" selection-start-line="11" selection-start-column="6" selection-end-line="11" selection-end-column="6" />
           <folding />
         </state>
       </provider>
