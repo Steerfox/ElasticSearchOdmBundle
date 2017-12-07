@@ -13,9 +13,9 @@ namespace Steerfox\ElasticsearchBundle\Service;
 
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
-use Steerfox\ElasticsearchBundle\Event\Events;
 use Steerfox\ElasticsearchBundle\Event\BulkEvent;
 use Steerfox\ElasticsearchBundle\Event\CommitEvent;
+use Steerfox\ElasticsearchBundle\Event\Events;
 use Steerfox\ElasticsearchBundle\Exception\BulkWithErrorsException;
 use Steerfox\ElasticsearchBundle\Mapping\Caser;
 use Steerfox\ElasticsearchBundle\Mapping\MetadataCollector;
@@ -28,54 +28,6 @@ use Symfony\Component\Stopwatch\Stopwatch;
  */
 class Manager
 {
-    /**
-     * @var string Manager name
-     */
-    private $name;
-
-    /**
-     * @var array Manager configuration
-     */
-    private $config = [];
-
-    /**
-     * @var Client
-     */
-    private $client;
-
-    /**
-     * @var Converter
-     */
-    private $converter;
-
-    /**
-     * @var array Container for bulk queries
-     */
-    private $bulkQueries = [];
-
-    /**
-     * @var array Holder for consistency, refresh and replication parameters
-     */
-    private $bulkParams = [];
-
-    /**
-     * @var array
-     */
-    private $indexSettings;
-
-    /**
-     * @var MetadataCollector
-     */
-    private $metadataCollector;
-
-    /**
-     * After commit to make data available the refresh or flush operation is needed
-     * so one of those methods has to be defined, the default is refresh.
-     *
-     * @var string
-     */
-    private $commitMode = 'refresh';
-
     /**
      * The size that defines after how much document inserts call commit function.
      *
@@ -91,9 +43,37 @@ class Manager
     private $bulkCount = 0;
 
     /**
-     * @var Repository[] Repository local cache
+     * @var array Holder for consistency, refresh and replication parameters
      */
-    private $repositories;
+    private $bulkParams = [];
+
+    /**
+     * @var array Container for bulk queries
+     */
+    private $bulkQueries = [];
+
+    /**
+     * @var Client
+     */
+    private $client;
+
+    /**
+     * After commit to make data available the refresh or flush operation is needed
+     * so one of those methods has to be defined, the default is refresh.
+     *
+     * @var string
+     */
+    private $commitMode = 'refresh';
+
+    /**
+     * @var array Manager configuration
+     */
+    private $config = [];
+
+    /**
+     * @var Converter
+     */
+    private $converter;
 
     /**
      * @var EventDispatcherInterface
@@ -101,13 +81,33 @@ class Manager
     private $eventDispatcher;
 
     /**
+     * @var array
+     */
+    private $indexSettings;
+
+    /**
+     * @var MetadataCollector
+     */
+    private $metadataCollector;
+
+    /**
+     * @var string Manager name
+     */
+    private $name;
+
+    /**
+     * @var Repository[] Repository local cache
+     */
+    private $repositories;
+
+    /**
      * @var Stopwatch
      */
     private $stopwatch;
 
     /**
-     * @param string            $name              Manager name
-     * @param array             $config            Manager configuration
+     * @param string            $name   Manager name
+     * @param array             $config Manager configuration
      * @param Client            $client
      * @param array             $indexSettings
      * @param MetadataCollector $metadataCollector
@@ -130,6 +130,69 @@ class Manager
     }
 
     /**
+     * Clears elasticsearch client cache.
+     */
+    public function clearCache()
+    {
+        $mappings = $this->getMetadataCollector()->getMappings($this->config['mappings']);
+        foreach ($mappings as $mappingData) {
+            $indexName = $this->getIndexNameByType($mappingData['type']);
+            if ($this->indexExists($indexName)) {
+                $this->getClient()->indices()->clearCache(['index' => $indexName]);
+            }
+        }
+    }
+
+    /**
+     * @return MetadataCollector
+     */
+    public function getMetadataCollector()
+    {
+        return $this->metadataCollector;
+    }
+
+    /**
+     * Get index name for type
+     *
+     * @param string $type Valid type name
+     *
+     * @return string Index name
+     * @throws \Exception
+     */
+    public function getIndexNameByType($type)
+    {
+        if ('' == $type || !array_key_exists($type, $this->indexSettings['body']['mappings'])) {
+            throw new \Exception('Type is required and be a valid type.');
+        }
+
+        return $this->getIndexName().'_'.Caser::snake($type);
+    }
+
+    /**
+     * Returns index name this connection is attached to.
+     *
+     * @return string
+     */
+    public function getIndexName()
+    {
+        return $this->indexSettings['index'];
+    }
+
+    /**
+     * Checks if connection index is already created.
+     *
+     * @return bool
+     */
+    public function indexExists($indexName = '')
+    {
+        if ('' == $indexName) {
+            throw new \Exception('Index name is required to check existing index');
+        }
+
+        return $this->getClient()->indices()->exists(['index' => $indexName]);
+    }
+
+    /**
      * Returns Elasticsearch connection.
      *
      * @return Client
@@ -140,11 +203,154 @@ class Manager
     }
 
     /**
+     * Clears scroll.
+     *
+     * @param string $scrollId
+     */
+    public function clearScroll($scrollId)
+    {
+        $this->getClient()->clearScroll(['scroll_id' => $scrollId]);
+    }
+
+    /**
+     * This method create all index for this manager if index not exist.
+     *
+     * @return array List of actions.
+     *
+     * @throws \Exception
+     */
+    public function createAllManagerIndex()
+    {
+        $actionRecap = [];
+        foreach ($this->indexSettings['body']['mappings'] as $typeName => $typeMapping) {
+            //Create Index by type
+            $indexName = $this->getIndexNameByType($typeName);
+            if (!$this->indexExists($indexName)) {
+                $indexSettings = [
+                    'index' => $indexName,
+                    'body' => [
+                        'settings' => $this->indexSettings['body']['settings'],
+                        'mappings'=> [
+                            $typeName => $typeMapping
+                        ]
+                    ]
+                ];
+
+
+                $result = $this->getClient()->indices()->create($indexSettings);
+                if($result['acknowledged'] != true){
+                    throw new \Exception('Index cannot created : ' . print_r($result, true));
+                }
+
+                $actionRecap[$typeName] = [
+                    'index' => $result['index'],
+                    'state' => 'Created.',
+                ];
+            } else {
+                $actionRecap[$typeName] = [
+                    'index' => $indexName,
+                    'state' => 'Already Exist',
+                ];
+            }
+        }
+
+        return $actionRecap;
+    }
+
+    /**
+     * Drops elasticsearch index.
+     */
+    public function dropIndex($indexName = '')
+    {
+        if ('' == $indexName) {
+            throw new \Exception('Index name is required to drop index');
+        }
+
+        return $this->getClient()->indices()->delete(['index' => $indexName]);
+    }
+
+    /**
+     * Returns a single document by ID. Returns NULL if document was not found.
+     *
+     * @param string $className Document class name or Elasticsearch type name
+     * @param string $id        Document ID to find
+     * @param string $routing   Custom routing for the document
+     *
+     * @return object
+     */
+    public function find($className, $id, $routing = null)
+    {
+        $type = $this->resolveTypeName($className);
+
+        $params = [
+            'index' => $this->getIndexNameByType($type),
+            'type'  => $type,
+            'id'    => $id,
+        ];
+
+        if ($routing) {
+            $params['routing'] = $routing;
+        }
+
+        try {
+            $result = $this->getClient()->get($params);
+        } catch (Missing404Exception $e) {
+            return null;
+        }
+
+        return $this->getConverter()->convertToDocument($result, $this);
+    }
+
+    /**
+     * Resolves type name by class name.
+     *
+     * @param string $className
+     *
      * @return string
      */
-    public function getName()
+    private function resolveTypeName($className)
     {
-        return $this->name;
+        if (strpos($className, ':') !== false || strpos($className, '\\') !== false) {
+            return $this->getMetadataCollector()->getDocumentType($className);
+        }
+
+        return $className;
+    }
+
+    /**
+     * @return Converter
+     */
+    public function getConverter()
+    {
+        return $this->converter;
+    }
+
+    /**
+     * Gets Elasticsearch aliases information.
+     *
+     * @param $params
+     *
+     * @return array
+     */
+    public function getAliases($params = [])
+    {
+        return $this->getClient()->indices()->getAliases($params);
+    }
+
+    /**
+     * @return int
+     */
+    public function getBulkCommitSize()
+    {
+        return $this->bulkCommitSize;
+    }
+
+    /**
+     * @param int $bulkCommitSize
+     */
+    public function setBulkCommitSize($bulkCommitSize)
+    {
+        $this->bulkCommitSize = $bulkCommitSize;
     }
 
     /**
@@ -156,19 +362,21 @@ class Manager
     }
 
     /**
-     * @param EventDispatcherInterface $eventDispatcher
+     * Returns mappings of the index for this connection.
+     *
+     * @return array
      */
-    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
+    public function getIndexMappings()
     {
-        $this->eventDispatcher = $eventDispatcher;
+        return $this->indexSettings['body']['mappings'];
     }
 
     /**
-     * @param Stopwatch $stopwatch
+     * @return string
      */
-    public function setStopwatch(Stopwatch $stopwatch)
+    public function getName()
     {
-        $this->stopwatch = $stopwatch;
+        return $this->name;
     }
 
     /**
@@ -207,58 +415,6 @@ class Manager
     }
 
     /**
-     * @return MetadataCollector
-     */
-    public function getMetadataCollector()
-    {
-        return $this->metadataCollector;
-    }
-
-    /**
-     * @return Converter
-     */
-    public function getConverter()
-    {
-        return $this->converter;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCommitMode()
-    {
-        return $this->commitMode;
-    }
-
-    /**
-     * @param string $commitMode
-     */
-    public function setCommitMode($commitMode)
-    {
-        if ($commitMode === 'refresh' || $commitMode === 'flush' || $commitMode === 'none') {
-            $this->commitMode = $commitMode;
-        } else {
-            throw new \LogicException('The commit method must be either refresh, flush or none.');
-        }
-    }
-
-    /**
-     * @return int
-     */
-    public function getBulkCommitSize()
-    {
-        return $this->bulkCommitSize;
-    }
-
-    /**
-     * @param int $bulkCommitSize
-     */
-    public function setBulkCommitSize($bulkCommitSize)
-    {
-        $this->bulkCommitSize = $bulkCommitSize;
-    }
-
-    /**
      * Creates a repository.
      *
      * @param string $className
@@ -271,43 +427,27 @@ class Manager
     }
 
     /**
-     * Executes search query in the index.
+     * Calls "Get Settings API" in Elasticsearch and will return you the currently configured settings.
      *
-     * @param array $types             List of types to search in.
-     * @param array $query             Query to execute.
-     * @param array $queryStringParams Query parameters.
-     *
-     * @return array
+     * return array
      */
-    public function search(array $types, array $query, array $queryStringParams = [])
+    public function getSettings($indexName = '')
     {
-        if(count($types)> 1){
-            throw new \Exception('Invalid query on mulitTypes');
+        if ('' === $indexName) {
+            throw new \Exception('Index name is require to get settings');
         }
 
-        $params = [];
-        $params['index'] = $this->getIndexName() . '_' . Caser::snake($types[0]);
-        
-        $resolvedTypes = [];
-        foreach ($types as $type) {
-            $resolvedTypes[] = $this->resolveTypeName($type);
-        }
-        
-        if (!empty($resolvedTypes)) {
-            $params['type'] = implode(',', $resolvedTypes);
-        }
-        
-        $params['body'] = $query;
+        return $this->getClient()->indices()->getSettings(['index' => $indexName]);
+    }
 
-        if (!empty($queryStringParams)) {
-            $params = array_merge($queryStringParams, $params);
-        }
-
-        $this->stopwatch('start', 'search');
-        $result = $this->client->search($params);
-        $this->stopwatch('stop', 'search');
-
-        return $result;
+    /**
+     * Returns Elasticsearch version number.
+     *
+     * @return string
+     */
+    public function getVersionNumber()
+    {
+        return $this->client->info()['version']['number'];
     }
 
     /**
@@ -324,47 +464,65 @@ class Manager
     }
 
     /**
-     * Adds document for removal.
+     * Adds query to bulk queries container.
      *
-     * @param object $document
+     * @param string       $operation One of: index, update, delete, create.
+     * @param string|array $type      Elasticsearch type name.
+     * @param array        $query     DSL to execute.
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return null|array
      */
-    public function remove($document)
+    public function bulk($operation, $type, array $query)
     {
-        $data = $this->converter->convertToArray($document, [], ['_id', '_routing']);
-
-        if (!isset($data['_id'])) {
-            throw new \LogicException(
-                'In order to use remove() method document class must have property with @Id annotation.'
-            );
+        if (!in_array($operation, ['index', 'create', 'update', 'delete'])) {
+            throw new \InvalidArgumentException('Wrong bulk operation selected');
         }
 
-        $type = $this->getMetadataCollector()->getDocumentType(get_class($document));
+        $this->eventDispatcher->dispatch(
+            Events::BULK,
+            new BulkEvent($operation, $type, $query)
+        );
 
-        $this->bulk('delete', $type, $data);
-    }
+        $indexName = $this->getIndexNameByType($type);
 
-    /**
-     * Flushes elasticsearch index.
-     *
-     * @param array $params
-     *
-     * @return array
-     */
-    public function flush(array $params = [])
-    {
-        return $this->client->indices()->flush($params);
-    }
+        $this->bulkQueries[$indexName]['body'][] = [
+            $operation => array_filter(
+                [
+                    '_type'    => $type,
+                    '_id'      => isset($query['_id']) ? $query['_id'] : null,
+                    '_ttl'     => isset($query['_ttl']) ? $query['_ttl'] : null,
+                    '_routing' => isset($query['_routing']) ? $query['_routing'] : null,
+                    '_parent'  => isset($query['_parent']) ? $query['_parent'] : null,
+                ]
+            ),
+        ];
+        unset($query['_id'], $query['_ttl'], $query['_parent'], $query['_routing']);
 
-    /**
-     * Refreshes elasticsearch index.
-     *
-     * @param array $params
-     *
-     * @return array
-     */
-    public function refresh(array $params = [])
-    {
-        return $this->client->indices()->refresh($params);
+        switch ($operation) {
+            case 'index':
+            case 'create':
+            case 'update':
+                $this->bulkQueries[$indexName]['body'][] = $query;
+                break;
+            case 'delete':
+                // Body for delete operation is not needed to apply.
+            default:
+                // Do nothing.
+                break;
+        }
+
+        // We are using counter because there is to difficult to resolve this from bulkQueries array.
+        $this->bulkCount++;
+
+        $response = null;
+
+        if ($this->bulkCommitSize === $this->bulkCount) {
+            $response = $this->commit();
+        }
+
+        return $response;
     }
 
     /**
@@ -379,7 +537,6 @@ class Manager
     public function commit(array $params = [])
     {
         if (!empty($this->bulkQueries)) {
-
             foreach ($this->bulkQueries as $indexName => $bullQueriesByIndex) {
                 $bulkQueries = array_merge($bullQueriesByIndex, $this->bulkParams);
                 $bulkQueries['index']['_index'] = $indexName;
@@ -430,217 +587,80 @@ class Manager
     }
 
     /**
-     * Adds query to bulk queries container.
-     *
-     * @param string       $operation One of: index, update, delete, create.
-     * @param string|array $type      Elasticsearch type name.
-     * @param array        $query     DSL to execute.
-     *
-     * @throws \InvalidArgumentException
-     *
-     * @return null|array
-     */
-    public function bulk($operation, $type, array $query)
-    {
-        if (!in_array($operation, ['index', 'create', 'update', 'delete'])) {
-            throw new \InvalidArgumentException('Wrong bulk operation selected');
-        }
-
-        $this->eventDispatcher->dispatch(
-            Events::BULK,
-            new BulkEvent($operation, $type, $query)
-        );
-
-        $indexName = $this->getIndexName() . '_'. Caser::snake($type);
-
-        $this->bulkQueries[$indexName]['body'][] = [
-            $operation => array_filter(
-                [
-                    '_type' => $type,
-                    '_id' => isset($query['_id']) ? $query['_id'] : null,
-                    '_ttl' => isset($query['_ttl']) ? $query['_ttl'] : null,
-                    '_routing' => isset($query['_routing']) ? $query['_routing'] : null,
-                    '_parent' => isset($query['_parent']) ? $query['_parent'] : null,
-                ]
-            ),
-        ];
-        unset($query['_id'], $query['_ttl'], $query['_parent'], $query['_routing']);
-
-        switch ($operation) {
-            case 'index':
-            case 'create':
-            case 'update':
-                $this->bulkQueries[$indexName]['body'][] = $query;
-                break;
-            case 'delete':
-                // Body for delete operation is not needed to apply.
-            default:
-                // Do nothing.
-                break;
-        }
-
-        // We are using counter because there is to difficult to resolve this from bulkQueries array.
-        $this->bulkCount++;
-
-        $response = null;
-
-        if ($this->bulkCommitSize === $this->bulkCount) {
-            $response = $this->commit();
-        }
-
-        return $response;
-    }
-
-    /**
-     * Optional setter to change bulk query params.
-     *
-     * @param array $params Possible keys:
-     *                      ['consistency'] = (enum) Explicit write consistency setting for the operation.
-     *                      ['refresh']     = (boolean) Refresh the index after performing the operation.
-     *                      ['replication'] = (enum) Explicitly set the replication type.
-     */
-    public function setBulkParams(array $params)
-    {
-        $this->bulkParams = $params;
-    }
-
-    /**
-     * Creates fresh elasticsearch index.
-     *
-     * @param bool $noMapping Determines if mapping should be included.
-     *
-     * @return array
-     */
-    public function createIndex($noMapping = false)
-    {
-        if ($noMapping) {
-            unset($this->indexSettings['body']['mappings']);
-        }
-
-        return $this->getClient()->indices()->create($this->indexSettings);
-    }
-
-    /**
-     * Drops elasticsearch index.
-     */
-    public function dropIndex($indexName = '')
-    {
-        if('' == $indexName)throw new \Exception('Index name is required to drop index');
-        return $this->getClient()->indices()->delete(['index' => $indexName]);
-    }
-
-    /**
-     * Tries to drop and create fresh elasticsearch index.
-     *
-     * @param bool $noMapping Determines if mapping should be included.
-     *
-     * @return array
-     */
-    public function dropAndCreateIndex($noMapping = false)
-    {
-        try {
-            $this->dropIndex();
-        } catch (\Exception $e) {
-            // Do nothing, our target is to create new index.
-        }
-
-        return $this->createIndex($noMapping);
-    }
-
-    /**
-     * Checks if connection index is already created.
-     *
-     * @return bool
-     */
-    public function indexExists($indexName = '')
-    {
-        if('' == $indexName)throw new \Exception('Index name is required to check existing index');
-        return $this->getClient()->indices()->exists(['index' => $indexName]);
-    }
-
-    /**
-     * Returns index name this connection is attached to.
-     *
      * @return string
      */
-    public function getIndexName()
+    public function getCommitMode()
     {
-        return $this->indexSettings['index'];
+        return $this->commitMode;
     }
 
     /**
-     * Sets index name for this connection.
-     *
-     * @param string $name
+     * @param string $commitMode
      */
-    public function setIndexName($name)
+    public function setCommitMode($commitMode)
     {
-        $this->indexSettings['index'] = $name;
+        if ($commitMode === 'refresh' || $commitMode === 'flush' || $commitMode === 'none') {
+            $this->commitMode = $commitMode;
+        } else {
+            throw new \LogicException('The commit method must be either refresh, flush or none.');
+        }
     }
 
     /**
-     * Returns mappings of the index for this connection.
+     * Starts and stops an event in the stopwatch
+     *
+     * @param string $action only 'start' and 'stop'
+     * @param string $name   name of the event
+     */
+    private function stopwatch($action, $name)
+    {
+        if (isset($this->stopwatch)) {
+            $this->stopwatch->$action('steerfox_es: '.$name, 'steerfox_es');
+        }
+    }
+
+    /**
+     * Flushes elasticsearch index.
+     *
+     * @param array $params
      *
      * @return array
      */
-    public function getIndexMappings()
+    public function flush(array $params = [])
     {
-        return $this->indexSettings['body']['mappings'];
+        return $this->client->indices()->flush($params);
     }
 
     /**
-     * Returns Elasticsearch version number.
+     * Refreshes elasticsearch index.
      *
-     * @return string
+     * @param array $params
+     *
+     * @return array
      */
-    public function getVersionNumber()
+    public function refresh(array $params = [])
     {
-        return $this->client->info()['version']['number'];
+        return $this->client->indices()->refresh($params);
     }
 
     /**
-     * Clears elasticsearch client cache.
-     */
-    public function clearCache()
-    {
-        $mappings = $this->getMetadataCollector()->getMappings($this->config['mappings']);
-        foreach($mappings as $mappingData){
-            $indexName = $this->getIndexName() . '_' . Caser::snake($mappingData['type']);
-            if($this->indexExists($indexName))
-            $this->getClient()->indices()->clearCache(['index' => $indexName]);
-        }
-    }
-
-    /**
-     * Returns a single document by ID. Returns NULL if document was not found.
+     * Adds document for removal.
      *
-     * @param string $className Document class name or Elasticsearch type name
-     * @param string $id        Document ID to find
-     * @param string $routing   Custom routing for the document
-     *
-     * @return object
+     * @param object $document
      */
-    public function find($className, $id, $routing = null)
+    public function remove($document)
     {
-        $type = $this->resolveTypeName($className);
+        $data = $this->converter->convertToArray($document, [], ['_id', '_routing']);
 
-        $params = [
-            'index' => $this->getIndexName() . '_' . Caser::snake($type),
-            'type' => $type,
-            'id' => $id,
-        ];
-
-        if ($routing) {
-            $params['routing'] = $routing;
+        if (!isset($data['_id'])) {
+            throw new \LogicException(
+                'In order to use remove() method document class must have property with @Id annotation.'
+            );
         }
 
-        try {
-            $result = $this->getClient()->get($params);
-        } catch (Missing404Exception $e) {
-            return null;
-        }
+        $type = $this->getMetadataCollector()->getDocumentType(get_class($document));
 
-        return $this->getConverter()->convertToDocument($result, $this);
+        $this->bulk('delete', $type, $data);
     }
 
     /**
@@ -663,63 +683,81 @@ class Manager
     }
 
     /**
-     * Clears scroll.
+     * Executes search query in the index.
      *
-     * @param string $scrollId
-     */
-    public function clearScroll($scrollId)
-    {
-        $this->getClient()->clearScroll(['scroll_id' => $scrollId]);
-    }
-
-    /**
-     * Calls "Get Settings API" in Elasticsearch and will return you the currently configured settings.
-     *
-     * return array
-     */
-    public function getSettings($indexName = '')
-    {
-        if(''===$indexName)throw new \Exception('Index name is require to get settings');
-        return $this->getClient()->indices()->getSettings(['index' => $indexName]);
-    }
-
-    /**
-     * Gets Elasticsearch aliases information.
-     * @param $params
+     * @param array $types             List of types to search in.
+     * @param array $query             Query to execute.
+     * @param array $queryStringParams Query parameters.
      *
      * @return array
      */
-    public function getAliases($params = [])
+    public function search(array $types, array $query, array $queryStringParams = [])
     {
-        return $this->getClient()->indices()->getAliases($params);
+        if (count($types) > 1) {
+            throw new \Exception('Invalid query on mulitTypes');
+        }
+
+        $params = [];
+        $params['index'] = $this->getIndexNameByType($types[0]);
+
+        $resolvedTypes = [];
+        foreach ($types as $type) {
+            $resolvedTypes[] = $this->resolveTypeName($type);
+        }
+
+        if (!empty($resolvedTypes)) {
+            $params['type'] = implode(',', $resolvedTypes);
+        }
+
+        $params['body'] = $query;
+
+        if (!empty($queryStringParams)) {
+            $params = array_merge($queryStringParams, $params);
+        }
+
+        $this->stopwatch('start', 'search');
+        $result = $this->client->search($params);
+        $this->stopwatch('stop', 'search');
+
+        return $result;
     }
 
     /**
-     * Resolves type name by class name.
+     * Optional setter to change bulk query params.
      *
-     * @param string $className
-     *
-     * @return string
+     * @param array $params Possible keys:
+     *                      ['consistency'] = (enum) Explicit write consistency setting for the operation.
+     *                      ['refresh']     = (boolean) Refresh the index after performing the operation.
+     *                      ['replication'] = (enum) Explicitly set the replication type.
      */
-    private function resolveTypeName($className)
+    public function setBulkParams(array $params)
     {
-        if (strpos($className, ':') !== false || strpos($className, '\\') !== false) {
-            return $this->getMetadataCollector()->getDocumentType($className);
-        }
-
-        return $className;
+        $this->bulkParams = $params;
     }
 
     /**
-     * Starts and stops an event in the stopwatch
-     *
-     * @param string $action   only 'start' and 'stop'
-     * @param string $name     name of the event
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    private function stopwatch($action, $name)
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
     {
-        if (isset($this->stopwatch)) {
-            $this->stopwatch->$action('steerfox_es: '.$name, 'steerfox_es');
-        }
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
+    /**
+     * Sets index name for this connection.
+     *
+     * @param string $name
+     */
+    public function setIndexName($name)
+    {
+        $this->indexSettings['index'] = $name;
+    }
+
+    /**
+     * @param Stopwatch $stopwatch
+     */
+    public function setStopwatch(Stopwatch $stopwatch)
+    {
+        $this->stopwatch = $stopwatch;
     }
 }
