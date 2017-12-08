@@ -11,12 +11,15 @@
 
 namespace Steerfox\ElasticsearchBundle\Service;
 
-use Steerfox\ElasticsearchBundle\Result\ArrayIterator;
-use Steerfox\ElasticsearchBundle\Result\RawIterator;
 use ONGR\ElasticsearchDSL\Query\FullText\QueryStringQuery;
+use ONGR\ElasticsearchDSL\Query\FullText\SimpleQueryStringQuery;
+use ONGR\ElasticsearchDSL\Query\Joining\NestedQuery;
 use ONGR\ElasticsearchDSL\Search;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
+use Steerfox\ElasticsearchBundle\Annotation\Nested;
+use Steerfox\ElasticsearchBundle\Result\ArrayIterator;
 use Steerfox\ElasticsearchBundle\Result\DocumentIterator;
+use Steerfox\ElasticsearchBundle\Result\RawIterator;
 
 /**
  * Document repository class.
@@ -24,14 +27,14 @@ use Steerfox\ElasticsearchBundle\Result\DocumentIterator;
 class Repository
 {
     /**
-     * @var Manager
-     */
-    private $manager;
-
-    /**
      * @var string Fully qualified class name
      */
     private $className;
+
+    /**
+     * @var Manager
+     */
+    private $manager;
 
     /**
      * @var string Elasticsearch type name
@@ -62,6 +65,18 @@ class Repository
     }
 
     /**
+     * Resolves elasticsearch type by class name.
+     *
+     * @param string $className
+     *
+     * @return array
+     */
+    private function resolveType($className)
+    {
+        return $this->getManager()->getMetadataCollector()->getDocumentType($className);
+    }
+
+    /**
      * Returns elasticsearch manager used in the repository.
      *
      * @return Manager
@@ -72,11 +87,34 @@ class Repository
     }
 
     /**
-     * @return array
+     * Counts documents by given search.
+     *
+     * @param Search $search
+     * @param array  $params
+     * @param bool   $returnRaw If set true returns raw response gotten from client.
+     *
+     * @return int|array
      */
-    public function getType()
+    public function count(Search $search, array $params = [], $returnRaw = false)
     {
-        return $this->type;
+        $body = array_merge(
+            [
+                'index' => $this->getManager()->getIndexName(),
+                'type'  => $this->type,
+                'body'  => $search->toArray(),
+            ],
+            $params
+        );
+
+        $results = $this
+            ->getManager()
+            ->getClient()->count($body);
+
+        if ($returnRaw) {
+            return $results;
+        } else {
+            return $results['count'];
+        }
     }
 
     /**
@@ -93,6 +131,24 @@ class Repository
     }
 
     /**
+     * Returns ArrayIterator with access to unmodified documents directly.
+     *
+     * @param Search $search
+     *
+     * @return ArrayIterator
+     */
+    public function findArray(Search $search)
+    {
+        $results = $this->executeSearch($search);
+
+        return new ArrayIterator(
+            $results,
+            $this->getManager(),
+            $this->getScrollConfiguration($results, $search->getScroll())
+        );
+    }
+
+    /**
      * Returns documents by a set of ids
      *
      * @param array $ids
@@ -104,12 +160,12 @@ class Repository
         $args = [];
         $manager = $this->getManager();
         $args['body']['docs'] = [];
-        $args['index'] = $manager->getIndexName() . '_' . Caser::snake($this->getType());
+        $args['index'] = $manager->getIndexName().'_'.Caser::snake($this->getType());
         $args['type'] = $this->getType();
 
         foreach ($ids as $id) {
             $args['body']['docs'][] = [
-                '_id' => $id
+                '_id' => $id,
             ];
         }
 
@@ -117,9 +173,9 @@ class Repository
 
         $return = [
             'hits' => [
-                'hits' => [],
+                'hits'  => [],
                 'total' => 0,
-            ]
+            ],
         ];
 
         foreach ($mgetResponse['docs'] as $item) {
@@ -134,14 +190,36 @@ class Repository
     }
 
     /**
+     * @return array
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * Finds a single document by a set of criteria.
+     *
+     * @param array      $criteria Example: ['group' => ['best', 'worst'], 'job' => 'medic'].
+     * @param array|null $orderBy  Example: ['name' => 'ASC', 'surname' => 'DESC'].
+     *
+     * @return object|null The object.
+     */
+    public function findOneBy(array $criteria, array $orderBy = [])
+    {
+        return $this->findBy($criteria, $orderBy, 1, null)->current();
+    }
+
+    /**
      * Finds documents by a set of criteria.
      *
-     * @param array      $criteria   Example: ['group' => ['best', 'worst'], 'job' => 'medic'].
-     * @param array|null $orderBy    Example: ['name' => 'ASC', 'surname' => 'DESC'].
-     * @param int|null   $limit      Example: 5.
-     * @param int|null   $offset     Example: 30.
+     * @param array      $criteria Example: ['group' => ['best', 'worst'], 'job' => 'medic'].
+     * @param array|null $orderBy  Example: ['name' => 'ASC', 'surname' => 'DESC'].
+     * @param int|null   $limit    Example: 5.
+     * @param int|null   $offset   Example: 30.
      *
      * @return array|DocumentIterator The objects.
+     * @throws \Exception
      */
     public function findBy(
         array $criteria,
@@ -159,9 +237,28 @@ class Repository
         }
 
         foreach ($criteria as $field => $value) {
-            $search->addQuery(
-                new QueryStringQuery(is_array($value) ? implode(' OR ', $value) : $value, ['default_field' => $field])
-            );
+            $value = is_array($value) ? implode(' OR ', $value) : $value;
+            //Escape Value
+            $value = addcslashes($value, '/');
+            $query = new QueryStringQuery($value, ['default_field' => $field]);
+
+            if (false !== strpos($field, '.')) {
+                $fieldsParts = explode('.', $field);
+                if (2 == count($fieldsParts)) {
+                    $nestedPath = $fieldsParts[0];
+                } else {
+                    // TODO : implement multi level nested documents
+                    throw new \Exception('Not yet implemented');
+                    $nestedPath = implode('.', array_slice(0, -1));
+                }
+
+                if (Nested::NAME == $this->manager->getDocumentFieldType($this->type, $nestedPath)) {
+                    $nestedQuery = new NestedQuery($nestedPath, $query);
+                    $query = $nestedQuery;
+                }
+            }
+
+            $search->addQuery($query);
         }
 
         foreach ($orderBy as $field => $direction) {
@@ -172,19 +269,6 @@ class Repository
     }
 
     /**
-     * Finds a single document by a set of criteria.
-     *
-     * @param array      $criteria   Example: ['group' => ['best', 'worst'], 'job' => 'medic'].
-     * @param array|null $orderBy    Example: ['name' => 'ASC', 'surname' => 'DESC'].
-     *
-     * @return object|null The object.
-     */
-    public function findOneBy(array $criteria, array $orderBy = [])
-    {
-        return $this->findBy($criteria, $orderBy, 1, null)->current();
-    }
-
-    /**
      * Returns search instance.
      *
      * @return Search
@@ -192,6 +276,36 @@ class Repository
     public function createSearch()
     {
         return new Search();
+    }
+
+    /**
+     * Returns DocumentIterator with composed Document objects from array response.
+     *
+     * @param Search $search
+     *
+     * @return DocumentIterator
+     */
+    public function findDocuments(Search $search)
+    {
+        $results = $this->executeSearch($search);
+
+        return new DocumentIterator(
+            $results,
+            $this->getManager(),
+            $this->getScrollConfiguration($results, $search->getScroll())
+        );
+    }
+
+    /**
+     * Executes search to the elasticsearch and returns raw response.
+     *
+     * @param Search $search
+     *
+     * @return array
+     */
+    private function executeSearch(Search $search)
+    {
+        return $this->getManager()->search([$this->getType()], $search->toArray(), $search->getUriParams());
     }
 
     /**
@@ -214,43 +328,6 @@ class Repository
     }
 
     /**
-     * Returns DocumentIterator with composed Document objects from array response.
-     *
-     * @param Search $search
-     *
-     * @return DocumentIterator
-     */
-    public function findDocuments(Search $search)
-    {
-        $results = $this->executeSearch($search);
-
-        return new DocumentIterator(
-            $results,
-            $this->getManager(),
-            $this->getScrollConfiguration($results, $search->getScroll())
-        );
-    }
-
-
-    /**
-     * Returns ArrayIterator with access to unmodified documents directly.
-     *
-     * @param Search $search
-     *
-     * @return ArrayIterator
-     */
-    public function findArray(Search $search)
-    {
-        $results = $this->executeSearch($search);
-
-        return new ArrayIterator(
-            $results,
-            $this->getManager(),
-            $this->getScrollConfiguration($results, $search->getScroll())
-        );
-    }
-
-    /**
      * Returns RawIterator with access to node with all returned values included.
      *
      * @param Search $search
@@ -269,46 +346,13 @@ class Repository
     }
 
     /**
-     * Executes search to the elasticsearch and returns raw response.
+     * Returns fully qualified class name.
      *
-     * @param Search $search
-     *
-     * @return array
+     * @return string
      */
-    private function executeSearch(Search $search)
+    public function getClassName()
     {
-        return $this->getManager()->search([$this->getType()], $search->toArray(), $search->getUriParams());
-    }
-
-    /**
-     * Counts documents by given search.
-     *
-     * @param Search $search
-     * @param array  $params
-     * @param bool   $returnRaw If set true returns raw response gotten from client.
-     *
-     * @return int|array
-     */
-    public function count(Search $search, array $params = [], $returnRaw = false)
-    {
-        $body = array_merge(
-            [
-                'index' => $this->getManager()->getIndexName(),
-                'type' => $this->type,
-                'body' => $search->toArray(),
-            ],
-            $params
-        );
-
-        $results = $this
-            ->getManager()
-            ->getClient()->count($body);
-
-        if ($returnRaw) {
-            return $results;
-        } else {
-            return $results['count'];
-        }
+        return $this->className;
     }
 
     /**
@@ -325,8 +369,8 @@ class Repository
     {
         $params = [
             'index' => $this->getManager()->getIndexName(),
-            'type' => $this->type,
-            'id' => $id,
+            'type'  => $this->type,
+            'id'    => $id,
         ];
 
         if ($routing) {
@@ -352,43 +396,21 @@ class Repository
     {
         $body = array_filter(
             [
-                'doc' => $fields,
+                'doc'    => $fields,
                 'script' => $script,
             ]
         );
 
         $params = array_merge(
             [
-                'id' => $id,
+                'id'    => $id,
                 'index' => $this->getManager()->getIndexName(),
-                'type' => $this->type,
-                'body' => $body,
+                'type'  => $this->type,
+                'body'  => $body,
             ],
             $params
         );
 
         return $this->getManager()->getClient()->update($params);
-    }
-
-    /**
-     * Resolves elasticsearch type by class name.
-     *
-     * @param string $className
-     *
-     * @return array
-     */
-    private function resolveType($className)
-    {
-        return $this->getManager()->getMetadataCollector()->getDocumentType($className);
-    }
-
-    /**
-     * Returns fully qualified class name.
-     *
-     * @return string
-     */
-    public function getClassName()
-    {
-        return $this->className;
     }
 }

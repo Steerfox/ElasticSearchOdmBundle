@@ -4,4 +4,6 @@
 /Tests/app/build/
 /phpunit.xml
 /composer.lock
-.idea/
+/.idea/*
+/.idea/
+

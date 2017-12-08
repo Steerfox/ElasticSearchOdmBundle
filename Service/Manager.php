@@ -372,6 +372,43 @@ class Manager
     }
 
     /**
+     * Returns mappings of one type for this connection.
+     *
+     * @param string $type
+     *
+     * @return array
+     * @throws \Exception
+     */
+    public function getIndexMappingsByType($type)
+    {
+        if(!is_string($type) && !array_key_exists($type, $this->indexSettings['body']['mappings'])){
+            throw new \Exception('Cannot get mapping for type : ' . $type);
+        }
+
+        return $this->indexSettings['body']['mappings'][$type];
+    }
+
+    /**
+     * Get mapping for one field on type.
+     *
+     * @param $type
+     * @param $field
+     *
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getDocumentFieldType($type, $field)
+    {
+        $typeMapping = $this->getIndexMappingsByType($type);
+        if(!is_string($field) && !array_key_exists($field, $typeMapping['properties'])) {
+            throw new \Exception('Cannot get mapping for field : ' . $field);
+        }
+
+        return $typeMapping['properties'][$field]['type'];
+    }
+
+
+    /**
      * @return string
      */
     public function getName()
