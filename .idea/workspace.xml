@@ -4,9 +4,7 @@
     <list default="true" id="09f1c01f-dc1c-4abb-a995-66d76490eeab" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/Service/Manager.php" afterPath="$PROJECT_DIR$/Service/Manager.php" />
       <change beforePath="$PROJECT_DIR$/Service/Repository.php" afterPath="$PROJECT_DIR$/Service/Repository.php" />
-      <change beforePath="$PROJECT_DIR$/composer.json" afterPath="$PROJECT_DIR$/composer.json" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -51,8 +49,8 @@
       <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
-              <caret line="3" column="17" lean-forward="true" selection-start-line="3" selection-start-column="17" selection-end-line="3" selection-end-column="17" />
+            <state relative-caret-position="160">
+              <caret line="8" column="19" lean-forward="false" selection-start-line="8" selection-start-column="19" selection-end-line="8" selection-end-column="19" />
               <folding />
             </state>
           </provider>
@@ -83,7 +81,7 @@
       <file leaf-file-name="Manager.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Service/Manager.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="552">
+            <state relative-caret-position="492">
               <caret line="399" column="40" lean-forward="false" selection-start-line="399" selection-start-column="20" selection-end-line="399" selection-end-column="40" />
               <folding>
                 <element signature="e#286#311#0#PHP" expanded="true" />
@@ -105,8 +103,8 @@
       <file leaf-file-name="Repository.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Service/Repository.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="352">
-              <caret line="244" column="48" lean-forward="false" selection-start-line="244" selection-start-column="48" selection-end-line="244" selection-end-column="48" />
+            <state relative-caret-position="712">
+              <caret line="296" column="0" lean-forward="false" selection-start-line="296" selection-start-column="0" selection-end-line="296" selection-end-column="0" />
               <folding>
                 <element signature="e#286#344#0#PHP" expanded="true" />
               </folding>
@@ -326,12 +324,12 @@
       <workItem from="1511857597178" duration="2487000" />
       <workItem from="1512633844737" duration="5285000" />
       <workItem from="1512660806132" duration="2941000" />
-      <workItem from="1512720233472" duration="1808000" />
+      <workItem from="1512720233472" duration="2942000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="31230000" />
+    <option name="totallyTimeSpent" value="32364000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1031" y="1105" width="1861" height="1055" extended-state="6" />
@@ -755,16 +753,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Service/Manager.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="552">
-          <caret line="399" column="40" lean-forward="false" selection-start-line="399" selection-start-column="20" selection-end-line="399" selection-end-column="40" />
-          <folding>
-            <element signature="e#286#311#0#PHP" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Annotation/Nested.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="280">
@@ -773,10 +761,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Service/Manager.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="492">
+          <caret line="399" column="40" lean-forward="false" selection-start-line="399" selection-start-column="20" selection-end-line="399" selection-end-column="40" />
+          <folding>
+            <element signature="e#286#311#0#PHP" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Service/Repository.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="352">
-          <caret line="244" column="48" lean-forward="false" selection-start-line="244" selection-start-column="48" selection-end-line="244" selection-end-column="48" />
+        <state relative-caret-position="712">
+          <caret line="296" column="0" lean-forward="false" selection-start-line="296" selection-start-column="0" selection-end-line="296" selection-end-column="0" />
           <folding>
             <element signature="e#286#344#0#PHP" expanded="true" />
           </folding>
@@ -785,8 +783,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="3" column="17" lean-forward="true" selection-start-line="3" selection-start-column="17" selection-end-line="3" selection-end-column="17" />
+        <state relative-caret-position="160">
+          <caret line="8" column="19" lean-forward="false" selection-start-line="8" selection-start-column="19" selection-end-line="8" selection-end-column="19" />
           <folding />
         </state>
       </provider>

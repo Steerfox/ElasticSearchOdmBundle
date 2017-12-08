@@ -149,6 +149,45 @@ class Repository
     }
 
     /**
+     * Executes search to the elasticsearch and returns raw response.
+     *
+     * @param Search $search
+     *
+     * @return array
+     */
+    private function executeSearch(Search $search)
+    {
+        return $this->getManager()->search([$this->getType()], $search->toArray(), $search->getUriParams());
+    }
+
+    /**
+     * @return array
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * Parses scroll configuration from raw response.
+     *
+     * @param array  $raw
+     * @param string $scrollDuration
+     *
+     * @return array
+     */
+    public function getScrollConfiguration($raw, $scrollDuration)
+    {
+        $scrollConfig = [];
+        if (isset($raw['_scroll_id'])) {
+            $scrollConfig['_scroll_id'] = $raw['_scroll_id'];
+            $scrollConfig['duration'] = $scrollDuration;
+        }
+
+        return $scrollConfig;
+    }
+
+    /**
      * Returns documents by a set of ids
      *
      * @param array $ids
@@ -187,14 +226,6 @@ class Repository
         $return['hits']['total'] = count($return['hits']['hits']);
 
         return new DocumentIterator($return, $manager);
-    }
-
-    /**
-     * @return array
-     */
-    public function getType()
-    {
-        return $this->type;
     }
 
     /**
@@ -237,10 +268,13 @@ class Repository
         }
 
         foreach ($criteria as $field => $value) {
-            $value = is_array($value) ? implode(' OR ', $value) : $value;
-            //Escape Value
-            $value = addcslashes($value, '/');
-            $query = new QueryStringQuery($value, ['default_field' => $field]);
+            $valueQuery = is_array($value) ? implode(' OR ', $value) : $value;
+            //Escape slash for value search
+            if (strstr($valueQuery, '/')) {
+                $valueQuery = str_replace('/', '\/', $valueQuery);
+            }
+
+            $query = new QueryStringQuery($valueQuery, ['default_field' => $field]);
 
             if (false !== strpos($field, '.')) {
                 $fieldsParts = explode('.', $field);
@@ -252,12 +286,12 @@ class Repository
                     $nestedPath = implode('.', array_slice(0, -1));
                 }
 
+                // Only use nested for nested documents
                 if (Nested::NAME == $this->manager->getDocumentFieldType($this->type, $nestedPath)) {
                     $nestedQuery = new NestedQuery($nestedPath, $query);
                     $query = $nestedQuery;
                 }
             }
-
             $search->addQuery($query);
         }
 
@@ -294,37 +328,6 @@ class Repository
             $this->getManager(),
             $this->getScrollConfiguration($results, $search->getScroll())
         );
-    }
-
-    /**
-     * Executes search to the elasticsearch and returns raw response.
-     *
-     * @param Search $search
-     *
-     * @return array
-     */
-    private function executeSearch(Search $search)
-    {
-        return $this->getManager()->search([$this->getType()], $search->toArray(), $search->getUriParams());
-    }
-
-    /**
-     * Parses scroll configuration from raw response.
-     *
-     * @param array  $raw
-     * @param string $scrollDuration
-     *
-     * @return array
-     */
-    public function getScrollConfiguration($raw, $scrollDuration)
-    {
-        $scrollConfig = [];
-        if (isset($raw['_scroll_id'])) {
-            $scrollConfig['_scroll_id'] = $raw['_scroll_id'];
-            $scrollConfig['duration'] = $scrollDuration;
-        }
-
-        return $scrollConfig;
     }
 
     /**
