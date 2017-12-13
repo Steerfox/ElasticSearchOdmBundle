@@ -1,4 +1,4 @@
-# Currently in devlopment , don't use this bundle for production !
+# Currently in development , don't use this bundle for production !
 ## Our Objectives
 * This project is based on : https://github.com/ongr-io/ElasticsearchBundle
 * In the future, this package will only contain the ODM part (document with annotation, index creation, repository, simple query manager based ond elatica and elasticsearch package)
