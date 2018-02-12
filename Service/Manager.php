@@ -258,6 +258,47 @@ class Manager
     }
 
     /**
+     * This method update all index mapping.
+     *
+     * @return array List of actions.
+     *
+     * @throws \Exception
+     */
+    public function updateAllManagerIndex()
+    {
+        $actionRecap = [];
+        foreach ($this->indexSettings['body']['mappings'] as $typeName => $typeMapping) {
+            //Create Index by type
+            $indexName = $this->getIndexNameByType($typeName);
+            if ($this->indexExists($indexName)) {
+                $indexSettings = [
+                    'index' => $indexName,
+                    'type' => $typeName,
+                    'body' => $typeMapping
+                ];
+
+
+                $result = $this->getClient()->indices()->putMapping($indexSettings);
+                if($result['acknowledged'] != true){
+                    throw new \Exception('Index mapping cannot updated : ' . print_r($result, true));
+                }
+
+                $actionRecap[$typeName] = [
+                    'index' => $indexName,
+                    'state' => 'Mapping Updated.',
+                ];
+            } else {
+                $actionRecap[$typeName] = [
+                    'index' => $indexName,
+                    'state' => 'Index Not exist.',
+                ];
+            }
+        }
+
+        return $actionRecap;
+    }
+
+    /**
      * Drops elasticsearch index.
      */
     public function dropIndex($indexName = '')
