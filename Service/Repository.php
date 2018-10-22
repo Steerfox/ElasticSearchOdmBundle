@@ -273,6 +273,10 @@ class Repository
             if (strstr($valueQuery, '/')) {
                 $valueQuery = str_replace('/', '\/', $valueQuery);
             }
+            //Escape dash for value search
+            if (strstr($valueQuery, '-')) {
+                $valueQuery = str_replace('-', '\-', $valueQuery);
+            }
 
             $query = new QueryStringQuery($valueQuery, ['default_field' => $field]);
 
