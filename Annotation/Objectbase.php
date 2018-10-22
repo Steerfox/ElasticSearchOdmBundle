@@ -20,7 +20,7 @@ namespace Steerfox\ElasticsearchBundle\Annotation;
  * @Annotation
  * @Target("CLASS")
  */
-final class Object
+final class Objectbase
 {
     const NAME = 'object';
 

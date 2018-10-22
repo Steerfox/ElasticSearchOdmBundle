@@ -13,7 +13,7 @@ namespace Steerfox\ElasticsearchBundle\Result;
 
 use Doctrine\Common\Collections\Collection;
 use Steerfox\ElasticsearchBundle\Annotation\Nested;
-use Steerfox\ElasticsearchBundle\Annotation\Object;
+use Steerfox\ElasticsearchBundle\Annotation\Objectbase;
 use Steerfox\ElasticsearchBundle\Mapping\MetadataCollector;
 use Steerfox\ElasticsearchBundle\Service\Manager;
 
@@ -43,7 +43,7 @@ class Converter
      * @param array $rawData
      * @param Manager $manager
      *
-     * @return object
+     * @return Objectbase
      *
      * @throws \LogicException
      */
@@ -76,11 +76,11 @@ class Converter
     /**
      * Assigns all properties to object.
      *
-     * @param array  $array
-     * @param object $object
-     * @param array  $aliases
+     * @param array      $array
+     * @param Objectbase $object
+     * @param array      $aliases
      *
-     * @return object
+     * @return Objectbase
      */
     public function assignArrayToObject(array $array, $object, array $aliases)
     {
@@ -103,7 +103,7 @@ class Converter
                         $value = new \DateTime();
                         $value->setTimestamp($time);
                         break;
-                    case Object::NAME:
+                    case Objectbase::NAME:
                     case Nested::NAME:
                         if ($aliases[$name]['multiple']) {
                             $value = new ObjectIterator($this, $value, $aliases[$name]);
@@ -222,8 +222,8 @@ class Converter
     /**
      * Check if class matches the expected one.
      *
-     * @param object $object
-     * @param array $expectedClasses
+     * @param Objectbase $object
+     * @param array      $expectedClasses
      *
      * @throws \InvalidArgumentException
      */
@@ -262,7 +262,7 @@ class Converter
     /**
      * Returns aliases for certain document.
      *
-     * @param object $document
+     * @param Objectbase $document
      *
      * @return array
      */

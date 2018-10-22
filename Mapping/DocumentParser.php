@@ -30,7 +30,7 @@ class DocumentParser
     const PROPERTY_ANNOTATION = 'Steerfox\ElasticsearchBundle\Annotation\Property';
     const EMBEDDED_ANNOTATION = 'Steerfox\ElasticsearchBundle\Annotation\Embedded';
     const DOCUMENT_ANNOTATION = 'Steerfox\ElasticsearchBundle\Annotation\Document';
-    const OBJECT_ANNOTATION = 'Steerfox\ElasticsearchBundle\Annotation\Object';
+    const OBJECT_ANNOTATION = 'Steerfox\ElasticsearchBundle\Annotation\Objectbase';
     const NESTED_ANNOTATION = 'Steerfox\ElasticsearchBundle\Annotation\Nested';
 
     // Meta fields
@@ -382,7 +382,7 @@ class DocumentParser
             'Document',
             'Property',
             'Embedded',
-            'Object',
+            'Objectbase',
             'Nested',
             'Id',
             'ParentDocument',
