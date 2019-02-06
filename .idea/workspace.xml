@@ -2,11 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="09f1c01f-dc1c-4abb-a995-66d76490eeab" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/ElasticSearchOdmBundle.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/ElasticSearchOdmBundle.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Annotation/Object.php" beforeDir="false" afterPath="$PROJECT_DIR$/Annotation/Objectbase.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Mapping/DocumentParser.php" beforeDir="false" afterPath="$PROJECT_DIR$/Mapping/DocumentParser.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Result/Converter.php" beforeDir="false" afterPath="$PROJECT_DIR$/Result/Converter.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Service/Repository.php" beforeDir="false" afterPath="$PROJECT_DIR$/Service/Repository.php" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -16,36 +13,6 @@
   </component>
   <component name="ComposerSettings" doNotAsk="true" synchronizationState="SYNCHRONIZE">
     <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
-  </component>
-  <component name="FUSProjectUsageTrigger">
-    <session id="536896993">
-      <usages-collector id="statistics.lifecycle.project">
-        <counts>
-          <entry key="project.open.time.0" value="1" />
-          <entry key="project.opened" value="1" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.extensions.open">
-        <counts>
-          <entry key="php" value="2" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.types.open">
-        <counts>
-          <entry key="PHP" value="2" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.extensions.edit">
-        <counts>
-          <entry key="php" value="8" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.types.edit">
-        <counts>
-          <entry key="PHP" value="8" />
-        </counts>
-      </usages-collector>
-    </session>
   </component>
   <component name="FavoritesManager">
     <favorites_list name="ElasticSearchOdmBundle" />
@@ -88,17 +55,26 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Annotation/Objectbase.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="300">
-              <caret line="22" column="22" selection-start-line="22" selection-start-column="22" selection-end-line="22" selection-end-column="22" />
+            <state relative-caret-position="240">
+              <caret line="19" column="14" selection-start-line="19" selection-start-column="14" selection-end-line="19" selection-end-column="14" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Service/Repository.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="277">
+              <caret line="281" column="50" selection-start-line="281" selection-start-column="50" selection-end-line="281" selection-end-column="50" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Mapping/DocumentParser.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="752">
-              <caret line="390" column="22" lean-forward="true" selection-start-line="390" selection-start-column="22" selection-end-line="390" selection-end-column="22" />
+            <state relative-caret-position="7480">
+              <caret line="390" column="22" selection-start-line="390" selection-start-column="22" selection-end-line="390" selection-end-column="22" />
             </state>
           </provider>
         </entry>
@@ -161,30 +137,23 @@
         <option value="$PROJECT_DIR$/SteerfoxElasticsearchBundle.php" />
         <option value="$PROJECT_DIR$/Command/IndexCreateCommand.php" />
         <option value="$PROJECT_DIR$/composer.json" />
-        <option value="$PROJECT_DIR$/Service/Repository.php" />
         <option value="$PROJECT_DIR$/Command/IndexUpdateCommand.php" />
         <option value="$PROJECT_DIR$/Service/Manager.php" />
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/Annotation/Object.php" />
         <option value="$PROJECT_DIR$/Annotation/Objectbase.php" />
         <option value="$PROJECT_DIR$/Mapping/DocumentParser.php" />
+        <option value="$PROJECT_DIR$/Service/Repository.php" />
       </list>
     </option>
-  </component>
-  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
-  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
-  <component name="JsGulpfileManager">
-    <detection-done>true</detection-done>
-    <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="PhpServers">
     <servers />
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="1971" />
-    <option name="y" value="-2" />
+    <option name="x" value="51" />
     <option name="width" value="1869" />
-    <option name="height" value="1082" />
+    <option name="height" value="1080" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -239,11 +208,6 @@
               <item name="ElasticSearchOdmBundle" type="b2602c69:ProjectViewProjectNode" />
               <item name="ElasticSearchOdmBundle" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="ElasticSearchOdmBundle" type="b2602c69:ProjectViewProjectNode" />
-              <item name="ElasticSearchOdmBundle" type="462c0819:PsiDirectoryNode" />
-              <item name="Annotation" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
@@ -286,21 +250,23 @@
       <workItem from="1512720233472" duration="3689000" />
       <workItem from="1514561275697" duration="1154000" />
       <workItem from="1518419682150" duration="2625000" />
-      <workItem from="1540217009465" duration="47000" />
+      <workItem from="1540217009465" duration="649000" />
+      <workItem from="1540275390069" duration="599000" />
+      <workItem from="1540289096053" duration="597000" />
+      <workItem from="1549460667937" duration="25000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="36937000" />
+    <option name="totallyTimeSpent" value="38760000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1971" y="-2" width="1869" height="1082" extended-state="6" />
+    <frame x="51" y="0" width="1869" height="1080" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.4947479" visible="true" weight="0.24904004" />
-      <window_info id="Structure" order="1" sideWeight="0.5052521" side_tool="true" visible="true" weight="0.24904004" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.4915254" visible="true" weight="0.24904004" />
+      <window_info id="Structure" order="1" sideWeight="0.5084746" side_tool="true" visible="true" weight="0.24904004" />
       <window_info id="Favorites" order="2" sideWeight="0.495671" weight="0.3294766" />
-      <window_info anchor="bottom" id="Database Changes" show_stripe_button="false" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32900432" />
       <window_info anchor="bottom" id="Run" order="2" />
@@ -314,6 +280,7 @@
       <window_info anchor="bottom" id="Terminal" order="10" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="bottom" id="Docker" order="12" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Database Changes" order="13" show_stripe_button="false" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -325,9 +292,6 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
-  </component>
-  <component name="VcsContentAnnotationSettings">
-    <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/Generator/DocumentGenerator.php">
@@ -549,16 +513,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Service/Repository.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5620">
-          <caret line="296" selection-start-line="296" selection-end-line="296" />
-          <folding>
-            <element signature="e#286#344#0#PHP" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/composer.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="660">
@@ -600,17 +554,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Annotation/Objectbase.php">
+    <entry file="file://$PROJECT_DIR$/Mapping/DocumentParser.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="22" column="22" selection-start-line="22" selection-start-column="22" selection-end-line="22" selection-end-column="22" />
+        <state relative-caret-position="7480">
+          <caret line="390" column="22" selection-start-line="390" selection-start-column="22" selection-end-line="390" selection-end-column="22" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Mapping/DocumentParser.php">
+    <entry file="file://$PROJECT_DIR$/Annotation/Objectbase.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="752">
-          <caret line="390" column="22" lean-forward="true" selection-start-line="390" selection-start-column="22" selection-end-line="390" selection-end-column="22" />
+        <state relative-caret-position="240">
+          <caret line="19" column="14" selection-start-line="19" selection-start-column="14" selection-end-line="19" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Service/Repository.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="277">
+          <caret line="281" column="50" selection-start-line="281" selection-start-column="50" selection-end-line="281" selection-end-column="50" />
         </state>
       </provider>
     </entry>

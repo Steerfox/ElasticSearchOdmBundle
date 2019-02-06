@@ -277,6 +277,10 @@ class Repository
             if (strstr($valueQuery, '-')) {
                 $valueQuery = str_replace('-', '\-', $valueQuery);
             }
+            //Escape colon for value search
+            if (strstr($valueQuery, ':')) {
+                $valueQuery = str_replace(':', '\:', $valueQuery);
+            }
 
             $query = new QueryStringQuery($valueQuery, ['default_field' => $field]);
 
